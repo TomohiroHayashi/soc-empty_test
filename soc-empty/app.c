@@ -28,6 +28,7 @@
 
 /* Print boot message */
 static void bootMessage(struct gecko_msg_system_boot_evt_t *bootevt);
+static void printDeviceName(const gecko_configuration_t *pconfig);
 
 /* Flag for indicating DFU Reset must be performed */
 static uint8_t boot_to_dfu = 0;
@@ -66,6 +67,7 @@ void appMain(gecko_configuration_t *pconfig)
       case gecko_evt_system_boot_id:
 
         bootMessage(&(evt->data.evt_system_boot));
+        printDeviceName(pconfig);
         printLog("boot event - starting advertising\r\n");
 
         /* Set advertising parameters. 100ms advertisement interval.
@@ -135,6 +137,7 @@ static void bootMessage(struct gecko_msg_system_boot_evt_t *bootevt)
   bd_addr local_addr;
   int i;
 
+  printLog("Boot 1\r\n");
   printLog("stack version: %u.%u.%u\r\n", bootevt->major, bootevt->minor, bootevt->patch);
   local_addr = gecko_cmd_system_get_bt_address()->address;
 
@@ -143,5 +146,15 @@ static void bootMessage(struct gecko_msg_system_boot_evt_t *bootevt)
     printLog("%2.2x:", local_addr.addr[5 - i]);
   }
   printLog("%2.2x\r\n", local_addr.addr[0]);
+#endif
+}
+
+static void printDeviceName(const gecko_configuration_t *pconfig) {
+#if DEBUG_LEVEL
+  printLog("device name: ");
+  for (int i = 0; i < pconfig->gattdb->attributes[gattdb_device_name - 1].dynamicdata->max_len; i++) {
+	printLog("%c", pconfig->gattdb->attributes[gattdb_device_name - 1].dynamicdata->data[i]);
+  }
+  printLog("\r\n");
 #endif
 }
