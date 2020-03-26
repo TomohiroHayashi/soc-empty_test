@@ -25,6 +25,7 @@
 #include "gatt_db.h"
 
 #include "app.h"
+#include "ota_dfu_multislot.h"
 
 /* Print boot message */
 static void bootMessage(struct gecko_msg_system_boot_evt_t *bootevt);
@@ -58,6 +59,8 @@ void appMain(gecko_configuration_t *pconfig)
 
     /* Check for stack event. This is a blocking event listener. If you want non-blocking please see UG136. */
     evt = gecko_wait_event();
+
+    ota_dfu_handle_event(evt);
 
     /* Handle events */
     switch (BGLIB_MSG_ID(evt->header)) {
@@ -106,21 +109,21 @@ void appMain(gecko_configuration_t *pconfig)
 
       /* Check if the user-type OTA Control Characteristic was written.
        * If ota_control was written, boot the device into Device Firmware Upgrade (DFU) mode. */
-      case gecko_evt_gatt_server_user_write_request_id:
-
-        if (evt->data.evt_gatt_server_user_write_request.characteristic == gattdb_ota_control) {
-          /* Set flag to enter to OTA mode */
-          boot_to_dfu = 1;
-          /* Send response to Write Request */
-          gecko_cmd_gatt_server_send_user_write_response(
-            evt->data.evt_gatt_server_user_write_request.connection,
-            gattdb_ota_control,
-            bg_err_success);
-
-          /* Close connection to enter to DFU OTA mode */
-          gecko_cmd_le_connection_close(evt->data.evt_gatt_server_user_write_request.connection);
-        }
-        break;
+//      case gecko_evt_gatt_server_user_write_request_id:
+//
+//        if (evt->data.evt_gatt_server_user_write_request.characteristic == gattdb_ota_control) {
+//          /* Set flag to enter to OTA mode */
+//          boot_to_dfu = 1;
+//          /* Send response to Write Request */
+//          gecko_cmd_gatt_server_send_user_write_response(
+//            evt->data.evt_gatt_server_user_write_request.connection,
+//            gattdb_ota_control,
+//            bg_err_success);
+//
+//          /* Close connection to enter to DFU OTA mode */
+//          gecko_cmd_le_connection_close(evt->data.evt_gatt_server_user_write_request.connection);
+//        }
+//        break;
 
       /* Add additional event handlers as your application requires */
 
