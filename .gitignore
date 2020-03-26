@@ -1,0 +1,7 @@
+*.bak
+*.d
+*.o
+**/.pdm/
+BgBuild_Log.txt
+**/GNU*
+.vscode/
